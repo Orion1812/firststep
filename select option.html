@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staat, Region und Werkzeuge Auswahl (Multi-Select)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        div {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+        /* Stil für das Multi-Select, um es besser sichtbar zu machen */
+        select[multiple] {
+            height: 150px; /* Oder eine andere passende Höhe, um mehrere Optionen sichtbar zu machen */
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <label for="staat-select">Staat:</label>
+        <select id="staat-select">
+            <option value="">Bitte Staat auswählen</option>
+            <option value="Deutschland">Deutschland</option>
+            <option value="Oesterreich">Österreich</option>
+            <option value="Schweiz">Schweiz</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="region-select">Region:</label>
+        <select id="region-select">
+            <option value="">Bitte zuerst einen Staat auswählen</option>
+        </select>
+    </div>
+
+    <!-- Neues Menü für Werkzeuge mit Multi-Select-Funktion -->
+    <div>
+        <label for="werkzeuge-select">Werkzeuge (Mehrfachauswahl möglich):</label>
+        <select id="werkzeuge-select" multiple>
+            <option value="Hammer">Hammer</option>
+            <option value="Zange">Zange</option>
+            <option value="Schere">Schere</option>
+            <option value="Schrauber">Schrauber</option>
+            <option value="Messer">Messer</option>
+            <option value="Messe">Messe (Messinstrument)</option>
+            <option value="Messgeraet">Messgerät</option>
+            <option value="Schreiber">Schreiber</option>
+            <option value="Flasche">Flasche</option>
+            <option value="Bohrmaschine">Bohrmaschine</option>
+        </select>
+    </div>
+
+    <script>
+        // Datenstruktur für Staaten und Regionen
+        const regionsData = {
+            Deutschland: [
+                "Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen",
+                "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen",
+                "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen",
+                "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"
+            ],
+            Oesterreich: [
+                "Burgenland", "Kärnten", "Niederösterreich", "Oberösterreich",
+                "Salzburg", "Steiermark", "Tirol", "Vorarlberg", "Wien"
+            ],
+            Schweiz: [
+                "Aargau", "Appenzell Innerrhoden", "Appenzell Ausserrhoden", "Basel-Landschaft",
+                "Basel-Stadt", "Bern", "Freiburg (Fribourg)", "Genf", "Glarus", "Graubünden",
+                "Jura", "Luzern", "Neuenburg (Neuchâtel)", "Nidwalden", "Obwalden",
+                "Schaffhausen", "Schwyz", "Solothurn", "St. Gallen", "Tessin (Ticino)",
+                "Thurgau", "Uri", "Waadt (Vaud)", "Wallis (Valais)", "Zug", "Zürich"
+            ]
+        };
+
+        // Referenzen auf die Select-Elemente
+        const staatSelect = document.getElementById('staat-select');
+        const regionSelect = document.getElementById('region-select');
+        // Das Werkzeuge-Menü benötigt keine JavaScript-Logik zur Initialisierung oder Abhängigkeit.
+
+        // Event-Listener für das Staat-Menü
+        staatSelect.addEventListener('change', () => {
+            const selectedStaat = staatSelect.value;
+            
+            // Alle aktuellen Optionen aus dem Region-Menü entfernen
+            regionSelect.innerHTML = '<option value="">Bitte Region auswählen</option>';
+
+            if (selectedStaat) {
+                const regions = regionsData[selectedStaat];
+                if (regions) {
+                    regions.forEach(region => {
+                        const option = document.createElement('option');
+                        option.value = region;
+                        option.textContent = region;
+                        regionSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

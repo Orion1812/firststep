@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benutzerdefiniertes Multi-Select Werkzeug-Menü (mit UL/LI)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            margin-bottom: 20px;
+            width: 250px; /* Breite für das Menü */
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        /* --- Custom Select Styling --- */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            display: inline-block;
+        }
+
+        .select-selected {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            min-height: 20px;
+        }
+
+        .select-selected::after {
+            content: '▼';
+            font-size: 0.8em;
+            color: #555;
+            transition: transform 0.2s;
+        }
+
+        .select-selected.open::after {
+            content: '▲';
+            transform: rotate(0deg);
+        }
+
+        /* Anpassungen für UL/LI */
+        .select-items {
+            list-style: none; /* Listenpunkte entfernen */
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .select-items li { /* Selektor von div auf li geändert */
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .select-items li:hover { /* Selektor von div auf li geändert */
+            background-color: #f1f1f1;
+        }
+
+        .select-items .selected-item {
+            background-color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .checkmark {
+            display: none;
+            margin-left: 10px;
+            color: green;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .select-items .selected-item .checkmark {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <label for="werkzeuge-custom-select">Werkzeuge:</label>
+        <div id="werkzeuge-custom-select" class="custom-select-wrapper">
+            <div class="select-selected">Bitte Werkzeuge auswählen</div>
+            <ul class="select-items"> <!-- UL statt DIV -->
+                <!-- LI Optionen werden per JavaScript generiert -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const tools = [
+            "Hammer", "Zange", "Schere", "Schrauber", "Messer", "Messe (Messinstrument)",
+            "Messgerät", "Schreiber", "Flasche", "Bohrmaschine"
+        ];
+
+        const customSelectWrapper = document.getElementById('werkzeuge-custom-select');
+        const selectSelected = customSelectWrapper.querySelector('.select-selected');
+        const selectItems = customSelectWrapper.querySelector('.select-items'); // Immer noch .select-items
+
+        let selectedTools = [];
+
+        function updateSelectedDisplayText() {
+            if (selectedTools.length === 0) {
+                selectSelected.textContent = "Bitte Werkzeuge auswählen";
+            } else if (selectedTools.length === 1) {
+                selectSelected.textContent = selectedTools[0];
+            } else {
+                selectSelected.textContent = `${selectedTools.length} Werkzeuge ausgewählt`;
+            }
+        }
+
+        tools.forEach(tool => {
+            const listItem = document.createElement('li'); // LI statt DIV
+            listItem.textContent = tool;
+            
+            const checkmarkSpan = document.createElement('span');
+            checkmarkSpan.className = 'checkmark';
+            checkmarkSpan.innerHTML = '&#10003;'; // Unicode für Häkchen (✓)
+            listItem.appendChild(checkmarkSpan);
+
+            listItem.addEventListener('click', function(event) {
+                event.stopPropagation();
+
+                const toolName = this.textContent.replace('✓', '').trim();
+                const index = selectedTools.indexOf(toolName);
+
+                if (index > -1) {
+                    selectedTools.splice(index, 1);
+                    this.classList.remove('selected-item');
+                    checkmarkSpan.style.display = 'none';
+                } else {
+                    selectedTools.push(toolName);
+                    this.classList.add('selected-item');
+                    checkmarkSpan.style.display = 'inline-block';
+                }
+                updateSelectedDisplayText();
+            });
+            selectItems.appendChild(listItem); // listItem (LI) anhängen
+        });
+
+        selectSelected.addEventListener('click', function() {
+            selectItems.style.display = selectItems.style.display === 'block' ? 'none' : 'block';
+            this.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!customSelectWrapper.contains(event.target)) {
+                selectItems.style.display = 'none';
+                selectSelected.classList.remove('open');
+            }
+        });
+
+        updateSelectedDisplayText();
+    </script>
+
+</body>
+</html>
