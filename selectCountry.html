@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staat, Region und Werkzeuge Auswahl (Multi-Select)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        div {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <label for="staat-select">Staat:</label>
+        <select id="staat-select">
+            <option value="">Bitte Staat auswählen</option>
+            <option value="DE">Deutschland</option>
+            <option value="AT">Österreich</option>
+            <option value="CH">Schweiz</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="region-select">Region:</label>
+        <select id="region-select">
+            <option value="">Bitte zuerst einen Staat auswählen</option>
+        </select>
+    </div>
+
+    <script>
+        let _regionsData = {}; // Globale Variable für die geladenen JSON-Daten
+
+        // Referenzen auf die Select-Elemente
+        const staatSelect = document.getElementById('staat-select');
+        const regionSelect = document.getElementById('region-select');
+
+        // Funktion zum Laden der JSON-Daten
+        async function loadRegionsData() {
+            try {
+                const response = await fetch('regions.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                _regionsData = await response.json();
+                console.log('Regionen-Daten erfolgreich geladen:', _regionsData);
+            } catch (error) {
+                console.error('Fehler beim Laden der Regionen-Daten:', error);
+                // Optional: Benutzer benachrichtigen oder Fallback-Logik implementieren
+                alert('Regionen-Daten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.');
+            }
+        }
+
+        // Event-Listener für das Staat-Menü
+        staatSelect.addEventListener('change', () => {
+            const selectedStaatAbbreviation = staatSelect.value;
+            
+            // Alle aktuellen Optionen aus dem Region-Menü entfernen
+            regionSelect.innerHTML = '<option value="">Bitte Region auswählen</option>';
+
+            if (selectedStaatAbbreviation && _regionsData[selectedStaatAbbreviation]) {
+                const regions = _regionsData[selectedStaatAbbreviation].regions;
+                
+                // Iteriere über die Regionen und füge sie als Optionen hinzu
+                for (const abbreviation in regions) {
+                    if (regions.hasOwnProperty(abbreviation)) {
+                        const fullRegionName = regions[abbreviation];
+                        const option = document.createElement('option');
+                        option.value = abbreviation; // Abkürzung als Value
+                        option.textContent = fullRegionName; // Voller Name als Text
+                        regionSelect.appendChild(option);
+                    }
+                }
+            } else {
+                 regionSelect.innerHTML = '<option value="">Bitte zuerst einen Staat auswählen</option>';
+            }
+        });
+
+        // JSON-Daten laden, sobald das Skript ausgeführt wird
+        loadRegionsData();
+    </script>
+
+</body>
+</html>
